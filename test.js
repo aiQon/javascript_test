@@ -169,7 +169,7 @@ $(document).ready(function () {
     $('#whatfreq, #whatwords, #sortasc, #sortdesc').change(reactOnChange);
 });
 
-function reactOnChange(evt){
+function reactOnChange(evt) {
     cleanContainer2();
     var whatToShow = $("input[name=what]:checked").val();
     var sorting = $("input[name=sort]:checked").val();
@@ -180,22 +180,26 @@ function reactOnChange(evt){
     if (whatToShow == 'freq') {
         showingList = getWordFrequencyList(helperMap);
 
-        if(sorting == 'asc'){
-            showingList.sort(function(a,b){return a-b});
-        }else if(sorting == 'desc'){
-            showingList.sort(function(a,b){return b-a});
+        if (sorting == 'asc') {
+            showingList.sort(function (a, b) {
+                return a - b
+            });
+        } else if (sorting == 'desc') {
+            showingList.sort(function (a, b) {
+                return b - a
+            });
         }
 
     } else {
         showingList = getWordFrequencyListWithWords(helperMap);
-        if(sorting == 'asc'){
-            showingList.sort(function(a, b) {
+        if (sorting == 'asc') {
+            showingList.sort(function (a, b) {
                 if (a.toLowerCase() < b.toLowerCase()) return -1;
                 if (a.toLowerCase() > b.toLowerCase()) return 1;
                 return 0;
             });
-        }else if(sorting == 'desc'){
-            showingList.sort(function(a, b) {
+        } else if (sorting == 'desc') {
+            showingList.sort(function (a, b) {
                 if (a.toLowerCase() < b.toLowerCase()) return 1;
                 if (a.toLowerCase() > b.toLowerCase()) return -1;
                 return 0;
@@ -204,12 +208,12 @@ function reactOnChange(evt){
     }
 
 
-    for(var itemKey in showingList){
+    for (var itemKey in showingList) {
         createNode(container, showingList[itemKey], 7);
     }
 }
 
-function cleanContainer2(){
+function cleanContainer2() {
     $("#id_content2").html("");
 }
 
@@ -259,28 +263,43 @@ $.ajax({
     // tell YQL what we want and that we want JSON
     data: {
         q: "select * from html where url=\"https://twitter.com/patientslikeme\"",
-        format: "json"
+        format: "html"
     },
 
     // work with the response
-    success: function( response ) {
-        var possible_bio = getObjects(response, 'description', 0)
-        console.log( JSON.stringify(possible_bio)); // server response
+    success: function (response) {
+        processYqlResult(response);
+        //var possible_bio = getObjects(response, 'description', 0)
+        //console.log(response); // server response
     }
 });
 
-function getObjects(obj, key, depth) {
-    var objects = [];
-    for (var i in obj) {
+function processYqlResult(response) {
 
-        //console.log("level: "+depth+" analyzing key:"+ i + " with " + obj[i]);
-
-        if (obj[i] != undefined && (obj[i].constructor === Object || obj[i].constructor === Array)) {
-            var level = depth+1;
-            objects = objects.concat(getObjects(obj[i], key, level));
-        } else if (i == key) {
-            objects.push(obj);
-        }
-    }
-    return objects;
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(response, "text/xml");
+    var element = getElementByXpath("//p[@class='profile-field']");
+    alert(element);
+    //var description = doc.querySelectorAll('        profile-field');
+    //console.log("found: " + JSON.stringify(description));
 }
+
+function getElementByXpath (path) {
+    return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+};
+
+//function getObjects(obj, key, depth) {
+//    var objects = [];
+//    for (var i in obj) {
+//
+//        //console.log("level: "+depth+" analyzing key:"+ i + " with " + obj[i]);
+//
+//        if (obj[i] != undefined && (obj[i].constructor === Object || obj[i].constructor === Array)) {
+//            var level = depth + 1;
+//            objects = objects.concat(getObjects(obj[i], key, level));
+//        } else if (i == key) {
+//            objects.push(obj);
+//        }
+//    }
+//    return objects;
+//}
