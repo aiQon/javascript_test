@@ -66,7 +66,7 @@ function solveQ1() {
 }
 
 var startDepth = 1;
-var contentArea = document.getElementById("id_content");
+var contentArea = document.getElementById("id_content1");
 var resultQ1 = solveQ1();
 
 function createTree(container, workingSet, depth) {
@@ -110,10 +110,10 @@ function toggleSiblings() {
 }
 
 createTree(contentArea, resultQ1, startDepth);
-
-$("h2").on("click", toggleSiblings);
-$("h3").on("click", toggleSiblings);
-
+$(document).ready(function () {
+    $("h2").on("click", toggleSiblings);
+    $("h3").on("click", toggleSiblings);
+});
 // test that your structure is correct - use qUnit or any other test framework in an external file
 
 // -> see test.html
@@ -126,6 +126,94 @@ $("h3").on("click", toggleSiblings);
 
 // given the text in the variable "corpus", write the following:
 var corpus = "The ship drew on and had safely passed the strait, which some volcanic shock has made between the Calasareigne and Jaros islands; had doubled Pomegue, and approached the harbor under topsails, jib, and spanker, but so slowly and sedately that the idlers, with that instinct which is the forerunner of evil, asked one another what misfortune could have happened on board. However, those experienced in navigation saw plainly that if any accident had occurred, it was not to the vessel herself, for she bore down with all the evidence of being skilfully handled, the anchor a-cockbill, the jib-boom guys already eased off, and standing by the side of the pilot, who was steering the Pharaon towards the narrow entrance of the inner port, was a young man, who, with activity and vigilant eye, watched every motion of the ship, and repeated each direction of the pilot.";
+
+
+function getWordMap(rawString) {
+
+    var splitArray = rawString.replace(/ |,|-|\.|\?|\!/g, " ").split(' ')
+    var holder = {}
+    for (var i in splitArray) {
+        var word = splitArray[i];
+        if (word != '') {
+
+            if (holder.hasOwnProperty(word)) {
+                holder[word] += 1;
+            } else {
+                holder[word] = 1;
+            }
+        }
+    }
+    return holder;
+}
+
+function getWordFrequencyList(wordMap) {
+    var resultList = [];
+    for (var element in wordMap) {
+        resultList.push(wordMap[element]);
+    }
+    return resultList;
+}
+
+function getWordFrequencyListWithWords(wordMap) {
+    var resultList = [];
+    for (var element in wordMap) {
+        resultList.push(element + " - " + wordMap[element]);
+    }
+    return resultList;
+}
+
+//var helperMap = getWordMap(corpus);
+//var frequencyList = getWordFrequencyList(helperMap);
+
+$(document).ready(function () {
+    $('#whatfreq, #whatwords, #sortasc, #sortdesc').change(reactOnChange);
+});
+
+function reactOnChange(evt){
+    cleanContainer2();
+    var whatToShow = $("input[name=what]:checked").val();
+    var sorting = $("input[name=sort]:checked").val();
+    var helperMap = getWordMap(corpus);
+    var showingList;
+
+    var container = document.getElementById("id_content2");
+    if (whatToShow == 'freq') {
+        showingList = getWordFrequencyList(helperMap);
+
+        if(sorting == 'asc'){
+            showingList.sort(function(a,b){return a-b});
+        }else if(sorting == 'desc'){
+            showingList.sort(function(a,b){return b-a});
+        }
+
+    } else {
+        showingList = getWordFrequencyListWithWords(helperMap);
+        if(sorting == 'asc'){
+            showingList.sort(function(a, b) {
+                if (a.toLowerCase() < b.toLowerCase()) return -1;
+                if (a.toLowerCase() > b.toLowerCase()) return 1;
+                return 0;
+            });
+        }else if(sorting == 'desc'){
+            showingList.sort(function(a, b) {
+                if (a.toLowerCase() < b.toLowerCase()) return 1;
+                if (a.toLowerCase() > b.toLowerCase()) return -1;
+                return 0;
+            });
+        }
+    }
+
+
+    for(var itemKey in showingList){
+        createNode(container, showingList[itemKey], 7);
+    }
+}
+
+function cleanContainer2(){
+    $("#id_content2").html("");
+}
+
+reactOnChange(undefined);
 
 // 1. calculate word frequency in the input text collection. Separators include [ ,-.?!]
 // 2. show word frequency in descending order and ascending order, based on a radio button in index.html
