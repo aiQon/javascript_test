@@ -1,3 +1,4 @@
+var solution = {};
 // #1
 
 // Given structure in attrStructure:
@@ -20,11 +21,104 @@
 //  {
 //    "(0008,002A)": "20130318124132"
 //  }
-var attrStructure = {"tag":"(0008,0018)","value":"1.3.51.0.7.1193286233.9961.33088.48048.47436.15671.21980","attr":[{"tag":"(0008,002A)","value":"20130318124132"},{"tag":"(0008,0020)","value":"20130318"},{"tag":"(0008,0030)","value":"123650"},{"tag":"(0008,0018)","value":"1.3.51.0.7.1193286233.9961.33088.48048.47436.15671.21980"},{"tag":"(0008,0060)","value":"CR"},{"tag":"(0008,103E)","value":"SUNRISE VIEW"},{"tag":"(0018,0015)","value":"KNEE"},{"tag":"(0018,1164)","value":"0.1\\0.1"},{"tag":"(0018,5101)","value":"AP"},{"tag":"(0020,0013)","value":"2"},{"tag":"(0020,0020)","value":"L\\F"},{"tag":"(0028,0030)","value":"0.10000000149011\\0.10000000149011"},{"tag":"(0028,1052)","value":"0"},{"tag":"(0028,1053)","value":"1"},{"tag":"(0028,1054)","value":"LOG_E REL"},{"tag":"(0028,0101)","value":"12"},{"tag":"(0028,0010)","value":"2328"},{"tag":"(0028,0011)","value":"2928"},{"tag":"(0008,1030)","value":"Femur Knee Leg"},{"tag":"(0010,0010)","value":"BEAN^ELENA"},{"tag":"(0010,0020)","value":"690100"},{"tag":"(0010,0030)","value":"19400826"},{"tag":"(0010,0040)","value":"F"},{"tag":"(0010,4000)","value":"L KNEE"}]};
+var attrStructure = {"tag": "(0008,0018)", "value": "1.3.51.0.7.1193286233.9961.33088.48048.47436.15671.21980", "attr": [
+    {"tag": "(0008,002A)", "value": "20130318124132"},
+    {"tag": "(0008,0020)", "value": "20130318"},
+    {"tag": "(0008,0030)", "value": "123650"},
+    {"tag": "(0008,0018)", "value": "1.3.51.0.7.1193286233.9961.33088.48048.47436.15671.21980"},
+    {"tag": "(0008,0060)", "value": "CR"},
+    {"tag": "(0008,103E)", "value": "SUNRISE VIEW"},
+    {"tag": "(0018,0015)", "value": "KNEE"},
+    {"tag": "(0018,1164)", "value": "0.1\\0.1"},
+    {"tag": "(0018,5101)", "value": "AP"},
+    {"tag": "(0020,0013)", "value": "2"},
+    {"tag": "(0020,0020)", "value": "L\\F"},
+    {"tag": "(0028,0030)", "value": "0.10000000149011\\0.10000000149011"},
+    {"tag": "(0028,1052)", "value": "0"},
+    {"tag": "(0028,1053)", "value": "1"},
+    {"tag": "(0028,1054)", "value": "LOG_E REL"},
+    {"tag": "(0028,0101)", "value": "12"},
+    {"tag": "(0028,0010)", "value": "2328"},
+    {"tag": "(0028,0011)", "value": "2928"},
+    {"tag": "(0008,1030)", "value": "Femur Knee Leg"},
+    {"tag": "(0010,0010)", "value": "BEAN^ELENA"},
+    {"tag": "(0010,0020)", "value": "690100"},
+    {"tag": "(0010,0030)", "value": "19400826"},
+    {"tag": "(0010,0040)", "value": "F"},
+    {"tag": "(0010,4000)", "value": "L KNEE"}
+]};
+
+function solveQ1() {
+    var result1Structure = [];
+    for (var elementKey in attrStructure.attr) {
+        var listEntry = {};
+        var element = attrStructure.attr[elementKey];
+
+        listEntry[attrStructure.tag] = attrStructure.value;
+        var tagName = element.tag;
+        var value = element.value;
+        var attrEntry = {};
+        attrEntry[tagName] = value;
+        listEntry["attr"] = attrEntry;
+        result1Structure.push(listEntry);
+    }
+    return result1Structure;
+}
+
+var startDepth = 1;
+var contentArea = document.getElementById("id_content");
+var resultQ1 = solveQ1();
+
+function createTree(container, workingSet, depth) {
+    var currentContainer = container;
+    for (var key in workingSet) {
+        if (workingSet[key].constructor === Object) {
+            var level = depth + 1;
+            currentContainer = createNode(currentContainer, key, depth)
+            createTree(currentContainer, workingSet[key], level);
+        }
+        else {
+            currentContainer = createNode(currentContainer, key, depth);
+            var level = depth + 1;
+            createNode(currentContainer, workingSet[key], level);
+        }
+    }
+}
+
+function createNode(parent, content, depth) {
+    if (depth === startDepth) {
+        return parent;
+    }
+    var divElement = document.createElement("div");
+    divElement.innerHTML = "<h" + depth + ">" + content + "</h" + depth + ">";
+    parent.appendChild(divElement);
+    return divElement;
+}
+
+function toggleSiblings() {
+
+    var element = $(this)[0];
+    while (element.nextElementSibling != undefined) {
+        var element = element.nextElementSibling;
+        if (element.style.display == '' || element.style.display == 'block') {
+            element.style.display = 'none';
+        } else {
+            element.style.display = 'block';
+        }
+    }
+
+}
+
+createTree(contentArea, resultQ1, startDepth);
+
+$("h2").on("click", toggleSiblings);
+$("h3").on("click", toggleSiblings);
 
 // test that your structure is correct - use qUnit or any other test framework in an external file
 
-// loop through the above data structure and create a tree-like output on the screen. 
+// -> see test.html
+
+// loop through the above data structure and create a tree-like output on the screen.
 // You can use jQuery to attach event handlers for hiding/showing nodes in the tree.
 
 
