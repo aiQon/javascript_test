@@ -238,3 +238,49 @@ reactOnChange(undefined);
 // 	a. make sure that the call contains data for all 10 twitter calls.
 // 	[{handle: 'twitter handle', link: 'twitter link', bio: 'twitter bio'}, ...]
 // 5. ensure that the last call is only called once, and only once all info has been both retrieved and output to the page.
+
+
+// http://stackoverflow.com/questions/17207850/need-help-converting-to-twitter-api-v1-1-javascript
+// --> Yes, sorry if it wasn't clear. Any attempts at a JavaScript only solution are 'hacky' and prone to error (and they're also much harder to work with).
+
+
+//found on https://learn.jquery.com/ajax/working-with-jsonp/
+
+// Using YQL and JSONP
+$.ajax({
+    url: "http://query.yahooapis.com/v1/public/yql",
+
+    // the name of the callback parameter, as specified by the YQL service
+    jsonp: "callback",
+
+    // tell jQuery we're expecting JSONP
+    dataType: "jsonp",
+
+    // tell YQL what we want and that we want JSON
+    data: {
+        q: "select * from html where url=\"https://twitter.com/patientslikeme\"",
+        format: "json"
+    },
+
+    // work with the response
+    success: function( response ) {
+        var possible_bio = getObjects(response, 'description', 0)
+        console.log( JSON.stringify(possible_bio)); // server response
+    }
+});
+
+function getObjects(obj, key, depth) {
+    var objects = [];
+    for (var i in obj) {
+
+        //console.log("level: "+depth+" analyzing key:"+ i + " with " + obj[i]);
+
+        if (obj[i] != undefined && (obj[i].constructor === Object || obj[i].constructor === Array)) {
+            var level = depth+1;
+            objects = objects.concat(getObjects(obj[i], key, level));
+        } else if (i == key) {
+            objects.push(obj);
+        }
+    }
+    return objects;
+}
